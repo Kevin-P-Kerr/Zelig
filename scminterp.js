@@ -73,36 +73,30 @@ evaluator.evaluate = function evaluate(expr, env) {
 
 	if (evaluator.isSelfEvaluating(expr[0])) {
 		return evaluator.selfEvaluate(expr);
-}	//else if (evaluator.isSymbol(expr, env) {
-	//		evaluate(evaluator.apply(expr, env)
-//}
+	if (expr[0] in evaluator.SpecialForms) {
+		return evaluator.SpecialForms[expr[0]](expr);
+}
 	else if (evaluator.isnumber(expr[0])) {
-		return expr;
+		return +expr;
 }	else {
-		console.log("Evaluate Error");
+		console.log("Evaluate Error"); 
 	}
 };
 
-//evaluator.isSymbol = function lookup(expr, env) {
-//	
-//	var sym = expr[0];
-//
-//	if (env.indexOf(sym)!== -1) {
-//		return true;
-//}	else if (env.indexOf(env)!== -1) {
-//		return(lookup(expr, env[env.indexOf(env)]));
-//}	else {
-//		return false;
-//	}
-//};
-			
-//evaluator.apply = function apply(expr, env)
-
-//	var sym = expr[0];
-//	var formal_params = [];
-//	var body = [];
-		
+evaluator.SpecialForms = { 
+	'if': function(expr, env) {
+		return evaluator.evaluate(evaluator.evaluate(expr[1], env) ? expr[2] : expr[3], env);
+	},
+	'define': function(expr, env) {
+		if (Array.isArray(expr[1]) {
+			env[expr[1][0]] = new Procedure(expr[1].slice(1), expr[2], env);
+		} else {
+			env[expr[1]] = evaluator.evaluate(expr[2], env);
+		}
+	},
 	
+		
+
 
 evaluator.isSelfEvaluating = function (expr) {
 		return ((expr === '+') || 
@@ -119,28 +113,28 @@ evaluator.isSelfEvaluating = function (expr) {
 
 
 evaluator.selfEvaluate = function selfevaluate(expr) {
-
+	
 	if (expr[0] === '+') {
-		return eval(evaluator.evaluate(expr[1]) + '+' + evaluator.evaluate(expr[2]));
+		return evaluator.evaluate(expr[1]) + evaluator.evaluate(expr[2]);
 }	else if (expr[0] === '*') {
-		return eval(evaluator.evaluate(expr[1]) + '*' + evaluator.evaluate(expr[2]));
+		return evaluator.evaluate(expr[1]) *  evaluator.evaluate(expr[2]);
 }	else if (expr[0] === '/') {
-		return eval(evaluator.evaluate(expr[1]) + '/' + evaluator.evaluate(expr[2]));
+		return evaluator.evaluate(expr[1]) / evaluator.evaluate(expr[2]);
 }	else if (expr[0] === '-') {
-		return(eval(evaluator.evaluate(expr[1]) + '-' + evaluator.evaluate(expr[2])));
+		return evaluator.evaluate(expr[1])  -  evaluator.evaluate(expr[2]);
 }	else if (expr[0] === '<') {
-		return eval(evaluator.evaluate(expr[1]) + '<' + evaluator.evaluate(expr[2]));
+		return evaluator.evaluate(expr[1])  <  evaluator.evaluate(expr[2]);
 }	else if (expr[0] === '>') {
-		return eval(evaluator.evaluate(expr[1]) + '>' + evaluator.evaluate(expr[2]));
+		return evaluator.evaluate(expr[1])  >  evaluator.evaluate(expr[2]);
 }	else if (expr[0] === '<=') {
-		return eval(evalutor.evaluate(expr[1]) + '<=' + evaluator.evaluate(expr[2]));
+		return evalutor.evaluate(expr[1])  <=  evaluator.evaluate(expr[2]);
 }	else if (expr[0] === '>=') {
-		return eval(evaluator.evaluate(expr[1]) + '>=' + evaluator.evaluate(expr[2]));
+		return evaluator.evaluate(expr[1])  >=  evaluator.evaluate(expr[2]);
 }	else {
 		console.log("Self Evaluate Error");
 	}
 };
-evaluator.isnumber = function(expr) {
+evaluator.isnumber = function(expr) {	
 	return (typeof parseInt(expr, 10) === "number" && isFinite(expr));
 };
 
