@@ -7,7 +7,6 @@ evaluator.getInput = function(input) {
 	evaluator.input = evaluator.input.replace(/\)/g, " )");
 	evaluator.input = evaluator.input.split(' ');
 	evaluator.input = evaluator.prep(evaluator.input);
-	//evaluator.index = 0;
 	evaluator.input = evaluator.makeList(evaluator.input);
 
 };
@@ -70,13 +69,12 @@ evaluator.getRemainder = function(an_array, pos) {
 };
 ////
 evaluator.evaluate = function evaluate(expr, env) {
-
-	if (evaluator.isSelfEvaluating(expr[0])) {
-		return evaluator.selfEvaluate(expr);
-	if (expr[0] in evaluator.SpecialForms) {
-		return evaluator.SpecialForms[expr[0]](expr);
-}
-	else if (evaluator.isnumber(expr[0])) {
+	if (expr[0] in evaluator.SpecialForms) { 
+		return evaluator.SpecialForms[expr[0]](expr, env);
+}   else if (expr[0] in env) {
+		var proc = env[expr[0]];
+		return proc.call(expr.slice(1));
+}	else if (evaluator.isnumber(expr[0])) {
 		return +expr;
 }	else {
 		console.log("Evaluate Error"); 
@@ -85,31 +83,17 @@ evaluator.evaluate = function evaluate(expr, env) {
 
 evaluator.SpecialForms = { 
 	'if': function(expr, env) {
-		return evaluator.evaluate(evaluator.evaluate(expr[1], env) ? expr[2] : expr[3], env);
+		return evaluator.evaluate(evaluator.evaluate(expr[1], env) ? expra[2] : expr[3], env);
 	},
-	'define': function(expr, env) {
-		if (Array.isArray(expr[1]) {
-			env[expr[1][0]] = new Procedure(expr[1].slice(1), expr[2], env);
+	'define': function (expr, env) {
+	     	if (Array.isArray(expr[1])) {
+				env[expr[1][0]] = new evaluator.Procedure(expr[1].slice(1), expr[2], env);
 		} else {
 			env[expr[1]] = evaluator.evaluate(expr[2], env);
 		}
-	},
-	
-		
-
-
-evaluator.isSelfEvaluating = function (expr) {
-		return ((expr === '+') || 
-				(expr === '-') ||
-				(expr === '*') ||
-				(expr === '/') ||
-				(expr === '<') || (expr === '>') ||
-				(expr === '<=') ||
-				(expr === '>=') ||
-				(expr === '='));
+	}
 };
-
-	
+		
 evaluator.isnumber = function(expr) {	
 	return (typeof parseInt(expr, 10) === "number" && isFinite(expr));
 };
@@ -123,7 +107,34 @@ evaluator.Procedure = function (formal_args, body, env) {
 
 evaluator.Procedure.prototype.call = function(args) {
 	var env = Object.create(this.env);
-	for (var i = 0, l = formal_args.length; i<=l; i++;)
+	for (var i = 0, l = formal_args.length; i<=l; i++) {
+			env[formal_args[i]] = args[i]; 
+		};
 	return evaluator.evaluate(this.body, env);
+};
 
+evaluator.NativeProcedure = function (formal_args, body, env) {
 
+	this.formal_args = formal_args;
+	this.body = body;
+	this.env = env;
+};
+
+evaluator.NativeProcedure.prototype.call = function(args) {
+	var env = Object.create(this.env);
+	for (var i = 0, l = formal_args.length; i<=1; i++) {
+		env[formal_args[i]] = args[i];
+		};
+	var body = this.body
+	return eval(evaluator.apply(env, body));
+};
+
+evaluator.apply = function (env, body) {
+	var eval_body = [];
+	for (var i = 0, l = body.length; i<=1; i++) {
+		body[i] in env ? eval_body[i] = env[body[i]] : eval_body[i] = body[i];
+	};
+	return eval_body;
+};	
+
+evaluator.GlobalEnv = {'+': new evaluator.NativeProcedure(['x', 'y'], ['evaluator.evaluate', '(', 'x', ')', '+', 'evaluator.evaluate', '(', 'y', ')'], evaluator.GlobalEnv)}; 
