@@ -121,29 +121,25 @@ evaluator.Procedure.prototype.call = function(args) {
 		return evaluator.evaluate(expr, env);
 	}, undefined);
 };
+		
 
-evaluator.NativeProcedure = function (formal_args, body, env) {
-
-	this.formal_args = formal_args;
-	this.body = body;
-	this.env = env;
+evaluator.NativeProcedure = function (handler) {
+	this.handler = handler;
 };
+
+evaluator.NativeProcedure.prototype = new evaluator.Procedure;
 
 evaluator.NativeProcedure.prototype.call = function(args) {
-	var env = Object.create(this.env);
-	for (var i = 0, l = formal_args.length; i<=1; i++) {
-		env[formal_args[i]] = args[i];
-		};
-	var body = this.body
-	return eval(evaluator.apply(env, body));
+	return this.handler(args);
 };
 
-evaluator.apply = function (env, body) {
-	var eval_body = [];
-	for (var i = 0, l = body.length; i<=1; i++) {
-		body[i] in env ? eval_body[i] = env[body[i]] : eval_body[i] = body[i];
-	};
-	return eval_body;
-};	
 
-evaluator.GlobalEnv = {'+': new evaluator.NativeProcedure(['x', 'y'], ['evaluator.evaluate', '(', 'x', ')', '+', 'evaluator.evaluate', '(', 'y', ')'], evaluator.GlobalEnv)}; 
+evaluator.GlobalEnv = {
+	'+': new evaluator.NativeProcedure(function (args) {
+		return args.reduce( function (acc, x) {
+			return x + acc;
+		}, 0); 
+	})
+};
+
+			
