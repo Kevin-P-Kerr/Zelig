@@ -69,15 +69,22 @@ evaluator.getRemainder = function(an_array, pos) {
 };
 ////
 evaluator.evaluate = function evaluate(expr, env) {
-	if (expr[0] in evaluator.SpecialForms) { 
-		return evaluator.SpecialForms[expr[0]](expr, env);
-}   else if (expr[0] in env) {
-		var proc = env[expr[0]];
-		return proc.call(expr.slice(1));
-}	else if (evaluator.isnumber(expr[0])) {
+	var evaluatedList;
+	if (Array.isArray(expr)) {
+		if (expr[0] in evaluator.SpecialForms) { 
+			return evaluator.SpecialForms[expr[0]](expr, env);
+		} else {
+			evaluatedList = expr.map(function (expr) {
+				return evaluator.evaluate(expr, env);
+			}); 
+			return evaluatedList[0].call(evaluatedList.slice(1));		
+		}	
+	} else if (evaluator.isnumber(expr)) {
 		return +expr;
-}	else {
-		console.log("Evaluate Error"); 
+	} else if (expr in env) {
+		return env[expr]; 
+	} else {
+		throw new Error("Evaluate Error"); 
 	}
 };
 
