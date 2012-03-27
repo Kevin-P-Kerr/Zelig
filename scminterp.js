@@ -68,7 +68,7 @@ evaluator.getRemainder = function(an_array, pos) {
 	}
 	return return_array;
 };
-
+////
 evaluator.evaluate = function evaluate(expr, env) {
 
 	if (evaluator.isSelfEvaluating(expr[0])) {
@@ -110,31 +110,20 @@ evaluator.isSelfEvaluating = function (expr) {
 };
 
 	
-
-
-evaluator.selfEvaluate = function selfevaluate(expr) {
-	
-	if (expr[0] === '+') {
-		return evaluator.evaluate(expr[1]) + evaluator.evaluate(expr[2]);
-}	else if (expr[0] === '*') {
-		return evaluator.evaluate(expr[1]) *  evaluator.evaluate(expr[2]);
-}	else if (expr[0] === '/') {
-		return evaluator.evaluate(expr[1]) / evaluator.evaluate(expr[2]);
-}	else if (expr[0] === '-') {
-		return evaluator.evaluate(expr[1])  -  evaluator.evaluate(expr[2]);
-}	else if (expr[0] === '<') {
-		return evaluator.evaluate(expr[1])  <  evaluator.evaluate(expr[2]);
-}	else if (expr[0] === '>') {
-		return evaluator.evaluate(expr[1])  >  evaluator.evaluate(expr[2]);
-}	else if (expr[0] === '<=') {
-		return evalutor.evaluate(expr[1])  <=  evaluator.evaluate(expr[2]);
-}	else if (expr[0] === '>=') {
-		return evaluator.evaluate(expr[1])  >=  evaluator.evaluate(expr[2]);
-}	else {
-		console.log("Self Evaluate Error");
-	}
-};
 evaluator.isnumber = function(expr) {	
 	return (typeof parseInt(expr, 10) === "number" && isFinite(expr));
 };
+
+evaluator.Procedure = function (formal_args, body, env) {
+		
+	this.formal_args = formal_args;
+	this.body = body;
+	this.env = env;
+}
+
+evaluator.Procedure.prototype.call = function(args) {
+	var env = Object.create(this.env);
+	for (var i = 0, l = formal_args.length; i<=l; i++;)
+	return evaluator.evaluate(this.body, env);
+
 
