@@ -114,8 +114,8 @@ evaluator.Procedure = function (formal_args, body, env) {
 
 evaluator.Procedure.prototype.call = function(args) {
 	var env = Object.create(this.env);
-	for (var i = 0, l = formal_args.length; i<=l; i++) {
-			env[formal_args[i]] = args[i]; 
+	for (var i = 0, l = this.formal_args.length; i<=l; i++) {
+			env[this.formal_args[i]] = args[i]; 
 		};
 	return this.body.reduce (function (acc, expr) {
 		return evaluator.evaluate(expr, env);
