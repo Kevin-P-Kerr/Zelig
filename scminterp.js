@@ -94,7 +94,7 @@ evaluator.SpecialForms = {
 	},
 	'define': function (expr, env) {
 	     	if (Array.isArray(expr[1])) {
-				env[expr[1][0]] = new evaluator.Procedure(expr[1].slice(1), expr[2], env);
+				env[expr[1][0]] = new evaluator.Procedure(expr[1].slice(1), expr.slice(2), env);
 		} else {
 			env[expr[1]] = evaluator.evaluate(expr[2], env);
 		}
@@ -117,7 +117,9 @@ evaluator.Procedure.prototype.call = function(args) {
 	for (var i = 0, l = formal_args.length; i<=l; i++) {
 			env[formal_args[i]] = args[i]; 
 		};
-	return evaluator.evaluate(this.body, env);
+	return this.body.reduce (function (acc, expr) {
+		return evaluator.evaluate(expr, env);
+	}, undefined);
 };
 
 evaluator.NativeProcedure = function (formal_args, body, env) {
