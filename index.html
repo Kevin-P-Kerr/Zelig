@@ -1,12 +1,75 @@
+<!DOCTYPE html>
 <html>
 <head>
-<script src="scminterp.js">
-</script> 
+	<style>
+		html{
+			font: 24px monospace;
+		}
+		body{
+			margin: 0;
+		}
+		#output{
+			list-style: none;
+			padding: 0;
+			margin: 0;
+		}
+		#output>li{
+			padding: 0.3em 0.5em 0.3em 1.5em;
+			border-bottom: 1px solid #CCC;
+		}
+		#output>li.input{
+			color: blue;
+		}
+		#output>li.output{
+			font-weight: bold;
+		}
+		#inputText{
+			display: inline-block;
+			background: none;
+			font: inherit;
+			border: none;
+			width: 100%;
+			padding: 0.3em 0.5em 0.3em 1.5em;
+			outline: none;
+			box-sizing: border-box;
+		}
+		#input::before{
+			content: '>';
+			display: block;
+			margin: 0.3em 0.5em;
+			position: absolute;
+		}
+	</style>
 </head>
 <body>
-<h1>Hey</h1>
-<form style="font-size:11px;" method="get" name="currencyform" action="currency.convert" target="_blank">
-<input type="text" size="20" />
-</form>
+	<ul id="output"></ul>
+	<div id="input">
+		<textarea id="inputText" rows=1></textarea>
+	</div>
+	<script src="scminterp.js"></script>
+	<script>
+		var outputList = document.getElementById('output'),
+			commandLine = document.getElementById('inputText');
+
+		commandLine.addEventListener('keydown', function(e){
+			var commandEl, outputEl;
+			if (e.keyCode === 13) {
+				if (commandLine.value) {
+					commandEl = document.createElement('li');
+					commandEl.className = 'input';
+					commandEl.appendChild(document.createTextNode(commandLine.value));
+					outputEl = document.createElement('li');
+					outputEl.className = 'output';
+
+					evaluator.getInput(commandLine.value);
+					outputEl.appendChild(document.createTextNode(evaluator.evaluate(evaluator.input, evaluator.GlobalEnv)));
+					outputList.appendChild(commandEl);
+					outputList.appendChild(outputEl);
+					commandLine.value = '';
+				}
+				e.preventDefault();
+			}
+		});
+	</script>
 </body>
 </html>
