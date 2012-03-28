@@ -26,6 +26,9 @@
 		#output>li.output{
 			font-weight: bold;
 		}
+		#output>li.error{
+			color: red;
+		}
 		#inputText{
 			display: inline-block;
 			background: none;
@@ -51,28 +54,32 @@
 	</div>
 	<script src="scminterp.js"></script>
 	<script>
+		var replHistory = {
+			el: document.getElementById('output'),
+			log: function(className, text) {
+				var msgEl = document.createElement('li');
+				msgEl.className = className;
+				msgEl.appendChild(document.createTextNode(text));
+				this.el.appendChild(msgEl);
+			}
+		};
 		var outputList = document.getElementById('output'),
 			commandLine = document.getElementById('inputText');
 
 		commandLine.addEventListener('keydown', function(e){
-			var commandEl;
 			if (e.keyCode === 13) {
 				if (commandLine.value) {
-					commandEl = document.createElement('li');
-					commandEl.className = 'input';
-					commandEl.appendChild(document.createTextNode(commandLine.value));
-					outputList.appendChild(commandEl);
-
-					evaluator.parse(commandLine.value).forEach(function(expr){
-						var result, outputEl;
-						result = evaluator.evaluate(expr, evaluator.GlobalEnv)
-						if (result !== undefined) {
-							outputEl = document.createElement('li');
-							outputEl.className = 'output';
-							outputEl.appendChild(document.createTextNode(result));
-							outputList.appendChild(outputEl);
-						}
-					});
+					replHistory.log('input', commandLine.value);
+					try {
+						evaluator.parse(commandLine.value).forEach(function(expr){
+							var result = evaluator.evaluate(expr, evaluator.GlobalEnv)
+							if (result !== undefined) {
+								replHistory.log('output', result);
+							}
+						});
+					} catch (e) {
+						replHistory.log('error', e);
+					}
 					commandLine.value = '';
 				}
 				e.preventDefault();
