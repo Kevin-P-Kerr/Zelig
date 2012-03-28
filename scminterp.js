@@ -104,6 +104,30 @@ evaluator.SpecialForms = {
 		}
 	}
 };
+
+evaluator.extractTest = function (expr) {
+	if (expr[0] === 'if') {
+		return expr[1];
+	} else {
+		throw Error("If Error");
+	}
+};
+
+evaluator.extractResult = function (expr) {
+	if (expr[0] === 'if') {
+		return expr[2];
+	} else {
+		throw Error("If Consequent Error");
+	}
+};
+
+evaluator.extractElse = function (expr) {
+	if (expr[0] === 'if') {
+		return expr[3];
+	} else {
+		throw Error("If Else Error");
+	}
+};
 		
 evaluator.isnumber = function(expr) {	
 	return (typeof parseInt(expr, 10) === "number" && isFinite(expr));
@@ -143,7 +167,20 @@ evaluator.GlobalEnv = {
 		return args.reduce( function (acc, x) {
 			return x + acc;
 		}, 0); 
-	})
-};
-
-			
+	}),
+	'<': new evaluator.NativeProcedure(function (args) {
+		return args[0] < args[1];
+		}),
+	'>': new evaluator.NativeProcedure(function (args) {
+		return args[0] > args[1];
+		}),
+	'<=': new evaluator.NativeProcedure(function (args) {
+		return args[0] <= args[1];
+		}),
+	'>=': new evaluator.NativeProcedure(function (args) {
+		return args[0] >= args[1]; 
+		}),
+	'=': new evaluator.NativeProcedure(function  (args) {
+		return args[0] === args[1];
+		})
+};			
