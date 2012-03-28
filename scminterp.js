@@ -126,6 +126,15 @@ evaluator.GlobalEnv = {
 			return x + acc;
 		}, 0); 
 	}),
+	'*': new evaluator.NativeProcedure(function (args) {
+		return args[0] * args[1];
+		}),
+	'-': new evaluator.NativeProcedure(function (args) {
+		return args[0] - args[1];
+		}),
+	'/': new evaluator.NativeProcedure(function (args) {
+		return args[0] / args[1];
+		}),
 	'<': new evaluator.NativeProcedure(function (args) {
 		return args[0] < args[1];
 		}),
