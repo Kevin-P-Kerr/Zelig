@@ -1,73 +1,31 @@
 evaluator = {};
 
-evaluator.getInput = function(input) {
-	
-	evaluator.input = input;
-	evaluator.input = evaluator.input.replace(/\(/g,  "( ");
-	evaluator.input = evaluator.input.replace(/\)/g, " )");
-	evaluator.input = evaluator.input.split(' ');
-	evaluator.input = evaluator.prep(evaluator.input);
-	evaluator.input = evaluator.makeList(evaluator.input);
-
+evaluator.parse = function(input) {
+	var match, exprs = [], stack = [exprs], newList;
+	while (input.length) {
+		if ((match = input.match(/^\(/))) {
+			newList = [];
+			stack[0].push(newList);
+			stack.unshift(newList);
+		}
+		else if ((match = input.match(/^\)/))) {
+			if (stack.length < 2) {
+				throw new Error("Unexpected \")\"");
+			}
+			stack.shift();
+		} else if ((match = input.match(/^ +/))) {
+			// Ignore whitespace
+		} else if ((match = input.match(/^[^ ()]+/))) { // What are valid identifiers?
+			stack[0].push(match[0]);
+		}
+		input = input.substr(match[0].length);
+	}
+	if (stack.length > 1) {
+		throw new Error("Unexpected end of input");
+	}
+	return exprs;
 };
 	
-evaluator.prep = function(an_array) {
-	var i = 0;
-	while (an_array[i] === ' ') {
-		++i;
-	}
-	if (an_array[i] === '(') {
-		var x = an_array;
-		x.shift();
-		return x;
-	}
-	else {
-		return an_array;
-	}
-};
-
-evaluator.makeList = function(an_array) {
-		evaluator.inarray = an_array;
-		var return_val = this.makeArray();
-		return return_val;
-	};
-
-evaluator.makeArray = function makearray() {
-
-				var new_array = [];
-				var i = 0;
-				while (evaluator.inarray[0]!==')') {
-					if (evaluator.inarray[0] === '(') {
-						evaluator.inarray.shift();
-						new_array[i] = makearray();
-						i++;
-						evaluator.inarray.shift();
-				   } else {
-						new_array[i] = evaluator.inarray[0];
-						i++;
-						evaluator.inarray.shift();
-				   }
-				}
-				return new_array;
-			};
-			
-
-
-evaluator.getRemainder = function(an_array, pos) {
-	
-	var i = 0;
-	var return_array = [];
-	var len = an_array.length;
-	pos++;
-
-	while (pos<=len) {
-		return_array[i] = an_array[pos];
-		pos++;
-		i++;
-	}
-	return return_array;
-};
-////
 evaluator.evaluate = function evaluate(expr, env) {
 	var evaluatedList;
 	if (Array.isArray(expr)) {

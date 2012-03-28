@@ -55,19 +55,24 @@
 			commandLine = document.getElementById('inputText');
 
 		commandLine.addEventListener('keydown', function(e){
-			var commandEl, outputEl;
+			var commandEl;
 			if (e.keyCode === 13) {
 				if (commandLine.value) {
 					commandEl = document.createElement('li');
 					commandEl.className = 'input';
 					commandEl.appendChild(document.createTextNode(commandLine.value));
-					outputEl = document.createElement('li');
-					outputEl.className = 'output';
-
-					evaluator.getInput(commandLine.value);
-					outputEl.appendChild(document.createTextNode(evaluator.evaluate(evaluator.input, evaluator.GlobalEnv)));
 					outputList.appendChild(commandEl);
-					outputList.appendChild(outputEl);
+
+					evaluator.parse(commandLine.value).forEach(function(expr){
+						var result, outputEl;
+						result = evaluator.evaluate(expr, evaluator.GlobalEnv)
+						if (result !== undefined) {
+							outputEl = document.createElement('li');
+							outputEl.className = 'output';
+							outputEl.appendChild(document.createTextNode(result));
+							outputList.appendChild(outputEl);
+						}
+					});
 					commandLine.value = '';
 				}
 				e.preventDefault();
