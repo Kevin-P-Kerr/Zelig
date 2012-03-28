@@ -1,1 +1,1 @@
-A Scheme Interperter in JavaScript.  Some other stuff.
+Zelig is a Scheme intrepreter written in Javascript that shares its global environment with multiple users. 
