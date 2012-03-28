@@ -90,7 +90,11 @@ evaluator.evaluate = function evaluate(expr, env) {
 
 evaluator.SpecialForms = { 
 	'if': function(expr, env) {
-		return evaluator.evaluate(evaluator.evaluate(expr[1], env) ? expra[2] : expr[3], env);
+		if (evaluator.evaluate(evaluator.extractTest(expr), env)) {
+			return evaluator.evaluate(evaluator.extractResult(expr), env);
+		} else {
+			return evaluator.evaluate(evaluator.extractElse(expr), env);
+		}
 	},
 	'define': function (expr, env) {
 	     	if (Array.isArray(expr[1])) {
