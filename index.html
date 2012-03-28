@@ -1,12 +1,96 @@
+<!DOCTYPE html>
 <html>
 <head>
-<script src="scminterp.js">
-</script> 
+	<style>
+		html, body{
+			height: 100%;
+		}
+		html{
+			font: 24px monospace;
+		}
+		body{
+			margin: 0;
+		}
+		#output{
+			list-style: none;
+			padding: 0;
+			margin: 0;
+		}
+		#output>li{
+			padding: 0.3em 0.5em 0.3em 1.5em;
+			border-bottom: 1px solid #CCC;
+		}
+		#output>li.input{
+			color: blue;
+		}
+		#output>li.output{
+			font-weight: bold;
+		}
+		#output>li.error{
+			color: red;
+		}
+		#inputText{
+			display: inline-block;
+			background: none;
+			font: inherit;
+			border: none;
+			width: 100%;
+			padding: 0.3em 0.5em 0.3em 1.5em;
+			outline: none;
+			box-sizing: border-box;
+		}
+		#input::before{
+			content: '>';
+			display: block;
+			margin: 0.3em 0.5em;
+			position: absolute;
+		}
+	</style>
 </head>
 <body>
-<h1>Hey</h1>
-<form style="font-size:11px;" method="get" name="currencyform" action="currency.convert" target="_blank">
-<input type="text" size="20" />
-</form>
+	<ul id="output"></ul>
+	<div id="input">
+		<textarea id="inputText" rows=1></textarea>
+	</div>
+	<script src="scminterp.js"></script>
+	<script>
+		var replHistory = {
+			el: document.getElementById('output'),
+			log: function(className, text) {
+				var msgEl = document.createElement('li');
+				msgEl.className = className;
+				msgEl.appendChild(document.createTextNode(text));
+				this.el.appendChild(msgEl);
+			}
+		};
+		var outputList = document.getElementById('output'),
+			commandLine = document.getElementById('inputText');
+
+		commandLine.addEventListener('keydown', function(e){
+			if (e.keyCode === 13) {
+				if (commandLine.value) {
+					replHistory.log('input', commandLine.value);
+					try {
+						evaluator.parse(commandLine.value).forEach(function(expr){
+							var result = evaluator.evaluate(expr, evaluator.GlobalEnv)
+							if (result !== undefined) {
+								replHistory.log('output', result);
+							}
+						});
+					} catch (e) {
+						replHistory.log('error', e);
+					}
+					commandLine.value = '';
+				}
+				e.preventDefault();
+			}
+		});
+		// Focus the command line when clicking on an empty area of body
+		document.body.addEventListener('click', function(e){
+			if (e.target === document.body){
+				commandLine.focus();
+			}
+		});
+	</script>
 </body>
 </html>
