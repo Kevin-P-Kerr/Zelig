@@ -41,6 +41,9 @@ evaluator.evaluate = function evaluate(expr, env) {
 		return +expr;
 	} else if (expr in env) {
 		return env[expr]; 
+	} else if (evaluator.cadrator.test(expr)) {
+		// Special case for unlimited caddaddaddar
+		return evaluator.cadrator.makeProcedure(expr);
 	} else {
 		throw new Error("Evaluate Error"); 
 	}
@@ -119,6 +122,24 @@ evaluator.NativeProcedure.prototype.call = function(args) {
 	return this.handler(args);
 };
 
+evaluator.cadrator = {
+	expr: /^c([ad]+)r$/,
+	car: function(l){ return l[0] },
+	cdr: function(l){ return l.slice(1); },
+	test: function(op){
+		return this.expr.test(op);
+	},
+	exec: function(op, list){
+		return op.match(this.expr)[1].split('').reduceRight(function(acc, op){
+			return({a: this.car, d: this.cdr}[op](acc));
+		}.bind(this), list);
+	},
+	makeProcedure: function(op){
+		return new evaluator.NativeProcedure(function(args){
+			return this.exec(op, args);
+		}.bind(this));
+	}
+};
 
 evaluator.GlobalEnv = {
 	'+': new evaluator.NativeProcedure(function (args) {
