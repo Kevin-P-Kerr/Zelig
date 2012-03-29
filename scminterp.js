@@ -127,14 +127,26 @@ evaluator.GlobalEnv = {
 		}, 0); 
 	}),
 	'*': new evaluator.NativeProcedure(function (args) {
-		return args[0] * args[1];
-		}),
+		return args.reduce(function (acc, x) {
+			return x * acc;
+		}, 1);
+	}),
 	'-': new evaluator.NativeProcedure(function (args) {
-		return args[0] - args[1];
-		}),
+		var len = args.length;
+		var n = 0;
+		while (n < len-1) {
+			args[n+1] = args[n] - args[n+1];
+			n++;
+		} return args[args.length-1];
+	}),
 	'/': new evaluator.NativeProcedure(function (args) {
-		return args[0] / args[1];
-		}),
+			var len = args.length;
+			var n = 0;
+			while (n < len-1) {
+				args[n+1] = args[n] / args[n+1];
+				++n;
+			} return args[len-1];
+	}),
 	'<': new evaluator.NativeProcedure(function (args) {
 		return args[0] < args[1];
 		}),
