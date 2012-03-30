@@ -110,7 +110,18 @@ evaluator.Procedure.prototype.call = function(args) {
 		return evaluator.evaluate(expr, env);
 	}, undefined);
 };
-		
+evaluator.Procedure.prototype.toString = function(){
+	return this.body.map(evaluator.exprToString).join(' ');
+}
+
+
+evaluator.exprToString = function(expr){
+	if (Array.isArray(expr)) {
+		return '(' + expr.map(evaluator.exprToString).join(' ') + ')';
+	} else {
+		return expr;
+	}
+}
 
 evaluator.NativeProcedure = function (handler) {
 	this.handler = handler;
@@ -121,6 +132,9 @@ evaluator.NativeProcedure.prototype = new evaluator.Procedure;
 evaluator.NativeProcedure.prototype.call = function(args) {
 	return this.handler(args);
 };
+evaluator.NativeProcedure.prototype.toString = function(){
+	return this.handler.toString();
+}
 
 evaluator.cadrator = {
 	expr: /^c([ad]+)r$/,
