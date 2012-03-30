@@ -60,10 +60,20 @@ evaluator.SpecialForms = {
 	'define': function (expr, env) {
 	     	if (Array.isArray(expr[1])) {
 				env[expr[1][0]] = new evaluator.Procedure(expr[1].slice(1), expr.slice(2), env);
+				return 'ok';
 		} else {
 			env[expr[1]] = evaluator.evaluate(expr[2], env);
+			return 'ok';
 		}
+	},
+	'quote': function (expr) {
+			return expr[1];
+		},
+	'lambda': function (expr, env) { 
+		return new evaluator.Procedure (expr[1], expr.slice(2), env);
 	}
+		
+				
 };
 
 evaluator.extractTest = function (expr) {
@@ -150,7 +160,7 @@ evaluator.cadrator = {
 	},
 	makeProcedure: function(op){
 		return new evaluator.NativeProcedure(function(args){
-			return this.exec(op, args);
+			return this.exec(op, args[0]);
 		}.bind(this));
 	}
 };
@@ -196,5 +206,8 @@ evaluator.GlobalEnv = {
 		}),
 	'=': new evaluator.NativeProcedure(function  (args) {
 		return args[0] === args[1];
+		}),
+	'eval': new evaluator.NativeProcedure(function (args) {
+		return evaluator.evaluate(args[0], evaluator.GlobalEnv);
 		})
-};			
+};
