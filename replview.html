@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html> 
+<head>	
+	<style>
+		div.header{
+			padding:10px;
+			height: 100px;
+			border: 1px solid #CCC;
+			background: azure;
+		} 
+		div.workspace {
+		display: block; 
+		height: 500px;
+		}
+		#clipb {
+			float: left;
+			height: inherit;
+			width: 610px;
+			font: arial;
+		} 
+		div.terminal {
+			padding: 0em 20em 0em 0em;
+			float: right;
+			height: 500px;
+			width: 400px;
+			font: arial; 
+			border-left: 1px solid #CCC;
+			border-bottom: 1px solid #CCC;
+		} div.input::before {
+			content: '>';
+			display: block;
+			margin: 0.3em 0.5em;
+			position: absolute;
+ 		} div.footer {
+			clear:both;
+			padding: 2em 0em 0em 0em;
+			border-top: 1px solid #CCC;
+		}div.clipb>li.list {
+			font-weight: bold;
+			padding: 0;
+			margin: 0;
+			list-style: none;
+		}div.input {
+			width: inherit;
+			height; 0.5em;
+			font: arial;
+		} #inputText {
+			width: 100%;
+			display: inline-block;
+			background: none;
+			border: none;
+			padding: 0em 0em 0em 1.5em;
+			box-sizing: border-box;
+		} 
+	</style>
+	<script src="https://raw.github.com/Kevin-P-Kerr/Zelig/master/scminterp.js"> </script>	
+</head>
+<body>
+<div class="workspace">
+	<div class="header"> Here is the header </div>
+	<div id="clipb"> Currently Defined Procedures</div> 
+	<div class="terminal">
+		<ul id="output"> Output </ul> 
+		<div class="input">
+			<textarea id="inputText" rows="1"> </textarea>
+			 </div> 
+		</div> 
+	</div>
+<div class="footer"> Look Up Definitions Here 
+ <textarea id="definition_lookup" rows="1"> </textarea> </div>
+	<p id="definition"> The definition will appear here </p>
+	<script>
+	var defn = document.getElementById('definition_lookup');
+	var defnHolder = document.getElementById('definition');
+	defn.addEventListener('keydown', function (e) {
+		if (e.keyCode === 13) {
+			if (defn.value) {
+				console.log(defn.value);
+				var val = defn.value;
+				if (val in evaluator.SpecialForms) {
+					defnHolder.textContent = evaluator.SpecialForms[val];
+				} else if (val in evaluator.GlobalEnv) {
+					if (defnHolder.textContent = evaluator.GlobalEnv[val].handler) { 
+						console.log(evaluator.GlobalEnv[val].handler);
+					}else { 
+						defnHolder.textContent = evaluator.GlobalEnv[val].body;	
+					}
+				}else {
+					defnHolder.textContent = "ERROR";
+				}
+				e.preventDefault();
+				defn.value = '';
+			}
+		} 
+	}); 
+			
+	var replHistory = {
+		el: document.getElementById('output'),
+		log: function (className, text) {
+			var msgEl = document.createElement('li');
+			msgEl.className = className;
+			msgEl.appendChild(document.createTextNode(text));
+			this.el.appendChild(msgEl);
+			}	
+		};
+//	var def = {
+//		el: document.getElementById('proc'),
+//		log: function (className, text) {
+//			var defEl = document.createElement('li');
+//			defEl.className = className;
+//			defEl.appendChile(document.createTextNode(text));
+//			this.el.appendChild(text);
+//		}
+//	};
+
+	var outputList = document.getElementById('output');
+	var commandLine = document.getElementById('inputText');
+//	var procedure_list = document.getElementById('clipb');
+
+//	procedure_list.addEventListener('click', function (e) {
+//		if (e.target === procedure_list.li) {
+//			var target = e.target.textContent;
+//			if (target in evaluator.GlobalEnv) {
+//				var def = evaluator.GlobalEnv[target];
+//				deflog('def', def);
+//			} else if (target in evaluator.SpecialForms) {
+//				var def = evaluator.SpecialForms[target];
+//				def.log('def', def);
+//			} else {
+//				console.log("wtf");
+//			}
+//		}
+//	}); how would you do something like this?
+			 	
+	commandLine.addEventListener('keydown', function (e) {
+		if (e.keyCode === 13) {
+			if (commandLine.value) {
+				replHistory.log('input', commandLine.value);
+				try {
+					evaluator.parse(commandLine.value).forEach(function (expr) {
+						var result = evaluator.evaluate(expr, evaluator.GlobalEnv)
+						if (result !== undefined) {
+						replHistory.log('output', result);
+						}			
+					});
+				} catch (e) {
+					replHistory.log('output', e);
+				}for (var proc in evaluator.GlobalEnv) {
+					if (proc in evaluator.procList) { // do nothing
+					} else {
+						proclist.update('proc', proc);
+						evaluator.procList[proc] = proc;
+					} 
+				}
+				commandLine.value = ''; 
+				}
+			e.preventDefault();
+			}
+		});
+		
+	evaluator.procList = {};
+	var proclist = { 
+		procs: document.getElementById('clipb'),
+		update: function  (className, text) {
+			var procEl = document.createElement('li');
+			procEl.className = className;
+			procEl.appendChild(document.createTextNode(text));
+			this.procs.appendChild(procEl);
+			}	
+	};
+	
+	for (var proc in evaluator.SpecialForms) {
+		proclist.update('output', proc);
+	};
+	for (var proc in evaluator.GlobalEnv) {
+		proclist.update('output', proc);
+		evaluator.procList[proc] = proc;
+	};
+	document.body.addEventListener('click', function (e) {
+		if (e.target === document.body) {
+			commandLine.focus();
+		}
+	}
+	);
+	var xmlhttp = new XMLHttpRequest();
+	window.setTimeout(function() { 
+		console.log("time out done");
+	}, 5000);
+	xmlhttp.open("GET", "./junk", true);
+	xmlhttp.send();
+
+	  </script> 
+</body>
+
+</html>
