@@ -81,6 +81,8 @@
 						replHistory.log('error', e);
 					}
 					commandLine.value = '';
+					// Scroll window to bottom
+					window.scrollTo(window.scrollX, document.documentElement.scrollHeight - document.documentElement.clientHeight);
 				}
 				e.preventDefault();
 			}
