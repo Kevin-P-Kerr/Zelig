@@ -91,24 +91,24 @@ evaluator.SpecialForms = {
 };
 
 evaluator.extractTest = function (expr) {
-	if (expr[0] === 'if') {
-		return expr[1];
+	if (expr.car === 'if') {
+		return expr.cdr.car;
 	} else {
 		throw Error("If Error");
 	}
 };
 
 evaluator.extractResult = function (expr) {
-	if (expr[0] === 'if') {
-		return expr[2];
+	if (expr.car === 'if') {
+		return expr.cdr.cdr.car;
 	} else {
 		throw Error("If Consequent Error");
 	}
 };
 
 evaluator.extractElse = function (expr) {
-	if (expr[0] === 'if') {
-		return expr[3];
+	if (expr.car === 'if') {
+		return expr.cdr.cdr.cdr.car;
 	} else {
 		throw Error("If Else Error");
 	}
