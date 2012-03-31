@@ -74,12 +74,10 @@ evaluator.SpecialForms = {
 		}
 	},
 	'define': function (expr, env) {
-	     	if (Array.isArray(expr[1])) {
-				env[expr[1][0]] = new evaluator.Procedure(expr[1].slice(1), expr.slice(2), env);
-				return 'ok';
+		if (expr.cdr.car instanceof evaluator.List) {
+			env[expr.cdr.car.car] = new evaluator.Procedure(expr.cdr.car.cdr, expr.cdr.cdr, env);
 		} else {
-			env[expr[1]] = evaluator.evaluate(expr[2], env);
-			return 'ok';
+			env[expr.cdr.car] = evaluator.evaluate(expr.cdr.cdr.car, env);
 		}
 	},
 	'quote': function (expr) {
