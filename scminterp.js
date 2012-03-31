@@ -2,6 +2,10 @@ evaluator = {};
 
 evaluator.List = function List(car, cdr) { this.car = car; this.cdr = cdr; };
 
+// Beware! These are all recursive.
+evaluator.List.prototype.map = function(proc){
+	return new evaluator.List(proc(this.car), this.cdr ? this.cdr.map(proc) : null);
+};
 evaluator.parse = function(input) {
 	var match, head = new evaluator.List(null, null), stack = [head], descending = false;
 	while (input.length) {
@@ -30,16 +34,17 @@ evaluator.parse = function(input) {
 	return head.cdr;
 };
 
+
 evaluator.evaluate = function evaluate(expr, env) {
 	var evaluatedList;
-	if (Array.isArray(expr)) {
-		if (expr[0] in evaluator.SpecialForms) { 
-			return evaluator.SpecialForms[expr[0]](expr, env);
+	if (expr instanceof evaluator.List) {
+		if (expr.car in evaluator.SpecialForms) {
+			return evaluator.SpecialForms[expr.car](expr, env);
 		} else {
-			evaluatedList = expr.map(function (expr) {
+			evaluatedList = expr.map(function(expr){
 				return evaluator.evaluate(expr, env);
-			}); 
-			return evaluatedList[0].call(evaluatedList.slice(1));		
+			});
+			return evaluatedList.car.call(evaluatedList.cdr);
 		}	
 	} else if (evaluator.isnumber(expr)) {
 		return +expr;
