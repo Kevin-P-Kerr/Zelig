@@ -1,31 +1,35 @@
 evaluator = {};
 
+evaluator.List = function List(car, cdr) { this.car = car; this.cdr = cdr; };
+
 evaluator.parse = function(input) {
-	var match, exprs = [], stack = [exprs], newList;
+	var match, head = new evaluator.List(null, null), stack = [head], descending = false;
 	while (input.length) {
 		if ((match = input.match(/^\(/))) {
-			newList = [];
-			stack[0].push(newList);
-			stack.unshift(newList);
+			stack[0] = stack[0][descending ? 'car' : 'cdr'] = new evaluator.List(null, null);
+			stack.unshift(stack[0]);
+			descending = true;
 		}
 		else if ((match = input.match(/^\)/))) {
 			if (stack.length < 2) {
 				throw new Error("Unexpected \")\"");
 			}
 			stack.shift();
+			descending = false;
 		} else if ((match = input.match(/^ +/))) {
 			// Ignore whitespace
 		} else if ((match = input.match(/^[^ ()]+/))) { // What are valid identifiers?
-			stack[0].push(match[0]);
+			stack[0] = stack[0][descending ? 'car' : 'cdr'] = new evaluator.List(match[0], null);
+			descending = false;
 		}
 		input = input.substr(match[0].length);
 	}
 	if (stack.length > 1) {
 		throw new Error("Unexpected end of input");
 	}
-	return exprs;
+	return head.cdr;
 };
-	
+
 evaluator.evaluate = function evaluate(expr, env) {
 	var evaluatedList;
 	if (Array.isArray(expr)) {
