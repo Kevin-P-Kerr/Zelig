@@ -164,8 +164,8 @@ evaluator.NativeProcedure.prototype.toString = function(){
 
 evaluator.cadrator = {
 	expr: /^c([ad]+)r$/,
-	car: function(l){ return l[0] },
-	cdr: function(l){ return l.slice(1); },
+	car: function(l){ return l.car; },
+	cdr: function(l){ return l.cdr; },
 	test: function(op){
 		return this.expr.test(op);
 	},
@@ -176,7 +176,7 @@ evaluator.cadrator = {
 	},
 	makeProcedure: function(op){
 		return new evaluator.NativeProcedure(function(args){
-			return this.exec(op, args[0]);
+			return this.exec(op, args.car);
 		}.bind(this));
 	}
 };
