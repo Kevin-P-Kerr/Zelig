@@ -81,7 +81,7 @@ evaluator.SpecialForms = {
 		}
 	},
 	'quote': function (expr) {
-			return expr[1];
+			return expr.cdr.car;
 		},
 	'lambda': function (expr, env) { 
 		return new evaluator.Procedure (expr[1], expr.slice(2), env);
