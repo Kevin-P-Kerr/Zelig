@@ -12,6 +12,14 @@ evaluator.List.prototype.forEach = function(proc){
 		this.cdr.forEach(proc);
 	}
 };
+evaluator.List.prototype.toString = function(inner){
+	var out = [], list = this;
+	while (list != null){
+		out.push(list.car instanceof this.constructor ? list.car.toString(true) : list.car);
+		list = list.cdr;
+	}
+	return (inner ? '' : "'") + "(" + out.join(' ') + ')';
+}
 
 evaluator.parse = function(input) {
 	var match, head = new evaluator.List(null, null), stack = [head], descending = false;
