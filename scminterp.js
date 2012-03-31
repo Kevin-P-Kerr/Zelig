@@ -183,9 +183,12 @@ evaluator.cadrator = {
 
 evaluator.GlobalEnv = {
 	'+': new evaluator.NativeProcedure(function (args) {
-		return args.reduce( function (acc, x) {
-			return x + acc;
-		}, 0); 
+		var total = 0;
+		while (args != null) {
+			total += args.car;
+			args = args.cdr;
+		}
+		return total;
 	}),
 	'*': new evaluator.NativeProcedure(function (args) {
 		return args.reduce(function (acc, x) {
