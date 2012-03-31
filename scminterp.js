@@ -191,9 +191,12 @@ evaluator.GlobalEnv = {
 		return total;
 	}),
 	'*': new evaluator.NativeProcedure(function (args) {
-		return args.reduce(function (acc, x) {
-			return x * acc;
-		}, 1);
+		var total = 1;
+		while (args != null) {
+			total *= args.car;
+			args = args.cdr;
+		}
+		return total;
 	}),
 	'-': new evaluator.NativeProcedure(function (args) {
 		var len = args.length;
