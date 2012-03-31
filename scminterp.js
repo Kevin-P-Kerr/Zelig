@@ -6,6 +6,13 @@ evaluator.List = function List(car, cdr) { this.car = car; this.cdr = cdr; };
 evaluator.List.prototype.map = function(proc){
 	return new evaluator.List(proc(this.car), this.cdr ? this.cdr.map(proc) : null);
 };
+evaluator.List.prototype.forEach = function(proc){
+	proc(this.car);
+	if (this.cdr) {
+		this.cdr.forEach(proc);
+	}
+};
+
 evaluator.parse = function(input) {
 	var match, head = new evaluator.List(null, null), stack = [head], descending = false;
 	while (input.length) {
