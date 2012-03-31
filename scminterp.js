@@ -84,7 +84,7 @@ evaluator.SpecialForms = {
 			return expr.cdr.car;
 		},
 	'lambda': function (expr, env) { 
-		return new evaluator.Procedure (expr[1], expr.slice(2), env);
+		return new evaluator.Procedure(expr.cdr.car, expr.cdr.cdr, env);
 	}
 		
 				
@@ -199,37 +199,38 @@ evaluator.GlobalEnv = {
 		return total;
 	}),
 	'-': new evaluator.NativeProcedure(function (args) {
-		var len = args.length;
-		var n = 0;
-		while (n < len-1) {
-			args[n+1] = args[n] - args[n+1];
-			n++;
-		} return args[args.length-1];
+		var total = 0;
+		while (args != null){
+			total -= args.car;
+			args = args.cdr;
+		}
+		return total;
 	}),
 	'/': new evaluator.NativeProcedure(function (args) {
-			var len = args.length;
-			var n = 0;
-			while (n < len-1) {
-				args[n+1] = args[n] / args[n+1];
-				++n;
-			} return args[len-1];
+		var total = args.car;
+		args = args.cdr;
+		while (args != null) {
+			total /= args.car;
+			args = args.cdr;
+		}
+		return total;
 	}),
 	'<': new evaluator.NativeProcedure(function (args) {
-		return args[0] < args[1];
-		}),
+		return args.car < args.cdr.car;
+	}),
 	'>': new evaluator.NativeProcedure(function (args) {
-		return args[0] > args[1];
-		}),
+		return args.car > args.cdr.car;
+	}),
 	'<=': new evaluator.NativeProcedure(function (args) {
-		return args[0] <= args[1];
-		}),
+		return args.car <= args.cdr.car;
+	}),
 	'>=': new evaluator.NativeProcedure(function (args) {
-		return args[0] >= args[1]; 
-		}),
+		return args.car >= args.cdr.car;
+	}),
 	'=': new evaluator.NativeProcedure(function  (args) {
-		return args[0] === args[1];
-		}),
+		return args.car === args.cdr.car;
+	}),
 	'eval': new evaluator.NativeProcedure(function (args) {
-		return evaluator.evaluate(args[0], evaluator.GlobalEnv);
-		})
+		return evaluator.evaluate(args.car, evaluator.GlobalEnv);
+	})
 };
