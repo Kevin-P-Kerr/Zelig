@@ -126,13 +126,15 @@ evaluator.Procedure = function (formal_args, body, env) {
 }
 
 evaluator.Procedure.prototype.call = function(args) {
-	var env = Object.create(this.env);
-	for (var i = 0, l = this.formal_args.length; i<=l; i++) {
-			env[this.formal_args[i]] = args[i]; 
-		};
-	return this.body.reduce (function (acc, expr) {
-		return evaluator.evaluate(expr, env);
-	}, undefined);
+	var env = Object.create(this.env), ret = undefined, expr;
+	this.formal_args.forEach(function(arg){
+		env[arg] = args.car;
+		args = args.cdr;
+	});
+	for (expr = this.body; expr != null; expr = expr.cdr) {
+		ret = evaluator.evaluate(expr.car, env);
+	}
+	return ret;
 };
 evaluator.Procedure.prototype.toString = function(){
 	return this.body.map(evaluator.exprToString).join(' ');
