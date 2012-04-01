@@ -242,3 +242,7 @@ evaluator.GlobalEnv = {
 		return evaluator.evaluate(args.car, evaluator.GlobalEnv);
 	})
 };
+
+if (typeof module !== 'undefined') {
+	module.exports = evaluator;
+}
