@@ -207,7 +207,8 @@ evaluator.GlobalEnv = {
 		return total;
 	}),
 	'-': new evaluator.NativeProcedure(function (args) {
-		var total = 0;
+		var total = args.car;
+		args = args.cdr;
 		while (args != null){
 			total -= args.car;
 			args = args.cdr;
