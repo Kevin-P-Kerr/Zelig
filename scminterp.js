@@ -7,10 +7,13 @@ evaluator.List.prototype.map = function(proc){
 	return new evaluator.List(proc(this.car), this.cdr ? this.cdr.map(proc) : null);
 };
 evaluator.List.prototype.forEach = function(proc){
-	proc(this.car);
-	if (this.cdr) {
-		this.cdr.forEach(proc);
+	function helper (list, index) {
+		proc(list.car, index);
+		if (list.cdr) {
+			helper(proc, list.cdr, index+1);
+		}
 	}
+	helper(this, 0);
 };
 evaluator.List.prototype.toString = function(inner){
 	var out = [], list = this;
