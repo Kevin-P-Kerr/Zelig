@@ -49,28 +49,73 @@ evaluator.parse = function(input) {
 	return head.cdr;
 };
 
-
-evaluator.evaluate = function evaluate(expr, env) {
-	var evaluatedList;
-	if (expr instanceof evaluator.List) {
-		if (expr.car in evaluator.SpecialForms) {
-			return evaluator.SpecialForms[expr.car](expr, env);
-		} else {
-			evaluatedList = expr.map(function(expr){
-				return evaluator.evaluate(expr, env);
-			});
-			return evaluatedList.car.call(evaluatedList.cdr);
-		}	
-	} else if (evaluator.isnumber(expr)) {
-		return +expr;
-	} else if (expr in env) {
-		return env[expr]; 
-	} else if (evaluator.cadrator.test(expr)) {
-		// Special case for unlimited caddaddaddar
-		return evaluator.cadrator.makeProcedure(expr);
-	} else {
-		throw new Error("Evaluate Error"); 
+// Cheating
+evaluator.Frame = function Frame(properties) {
+	for (var k in properties){
+		this[k] = properties[k];
 	}
+};
+
+evaluator.evaluate = function evaluate(expr) {
+	var stack = [new this.Frame({ body: expr, env: this.GlobalEnv })],
+		result = undefined, frame, ret, instruction;
+	newframe:
+	while (stack.length) {
+		frame = stack[0];
+		while (frame.body) {
+			instruction = frame.body.car;
+			frame.body = frame.body.cdr;
+			if (instruction instanceof evaluator.List) {
+				if (instruction.car in evaluator.SpecialForms) {
+					ret = evaluator.SpecialForms[instruction.car](instruction, frame.env);
+					if (ret instanceof this.Frame) {
+						this.stack.unshift(ret);
+						continue newframe;
+					} else {
+						result = ret;
+					}
+				} else {
+					stack.unshift(new this.Frame({ body: instruction, env: frame.env, list: [] }));
+					continue newframe;
+				}
+			} else if (evaluator.isnumber(instruction)) {
+				result = +instruction;
+			} else if (instruction in frame.env) {
+				result = frame.env[instruction];
+			} else if (evaluator.cadrator.test(instruction)) {
+				// Special case for unlimited caddaddaddar
+				result = evaluator.cadrator.makeProcedure(instruction);
+			} else {
+				throw new Error("Evaluate Error");
+			}
+			if ('list' in frame) {
+				frame.list.push(result);
+			}
+		}
+		stack.shift();
+		if ('list' in frame) {
+			ret = frame.list[0].prepare(frame.list.slice(1));
+			if (ret instanceof this.Frame) {
+				stack.unshift(ret);
+			} else {
+				result = ret;
+				if ('list' in stack[0]) {
+					stack[0].list.push(result);
+				}
+			}
+		} else if ('callback' in frame) {
+			ret = frame.callback(stack[0]);
+			if (ret instanceof this.Frame) {
+				stack.unshift(ret);
+			} else {
+				result = ret;
+				if ('list' in stack[0]) {
+					stack[0].list.push(result);
+				}
+			}
+		}
+	}
+	return result;
 };
 
 evaluator.SpecialForms = { 
@@ -163,7 +208,7 @@ evaluator.NativeProcedure = function (handler) {
 
 evaluator.NativeProcedure.prototype = new evaluator.Procedure;
 
-evaluator.NativeProcedure.prototype.call = function(args) {
+evaluator.NativeProcedure.prototype.prepare = function(args) {
 	return this.handler(args);
 };
 evaluator.NativeProcedure.prototype.toString = function(){
@@ -191,12 +236,9 @@ evaluator.cadrator = {
 
 evaluator.GlobalEnv = {
 	'+': new evaluator.NativeProcedure(function (args) {
-		var total = 0;
-		while (args != null) {
-			total += args.car;
-			args = args.cdr;
-		}
-		return total;
+		return args.reduce( function (acc, x) {
+			return x + acc;
+		}, 0);
 	}),
 	'*': new evaluator.NativeProcedure(function (args) {
 		var total = 1;

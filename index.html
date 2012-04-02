@@ -72,7 +72,7 @@
 					replHistory.log('input', commandLine.value);
 					try {
 						evaluator.parse(commandLine.value).forEach(function(expr){
-							var result = evaluator.evaluate(expr, evaluator.GlobalEnv)
+							var result = evaluator.evaluate(new evaluator.List(expr, null))
 							if (result !== undefined) {
 								replHistory.log('output', result);
 							}
