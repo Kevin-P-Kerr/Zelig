@@ -133,7 +133,13 @@ evaluator.SpecialForms = {
 		if (expr.cdr.car instanceof evaluator.List) {
 			env[expr.cdr.car.car] = new evaluator.Procedure(expr.cdr.car.cdr, expr.cdr.cdr, env);
 		} else {
-			env[expr.cdr.car] = evaluator.evaluate(expr.cdr.cdr.car, env);
+			return new evaluator.Frame({
+				body: new evaluator.List(expr.cdr.cdr.car, null),
+				env: env,
+				callback: function (result) {
+					env[expr.cdr.car] = result;
+				}
+			});
 		}
 	},
 	'quote': function (expr) {
@@ -181,17 +187,14 @@ evaluator.Procedure = function (formal_args, body, env) {
 	this.env = env;
 }
 
-evaluator.Procedure.prototype.call = function(args) {
-	var env = Object.create(this.env), ret = undefined, expr;
-	this.formal_args.forEach(function(arg){
-		env[arg] = args.car;
-		args = args.cdr;
+evaluator.Procedure.prototype.prepare = function(args) {
+	var env = Object.create(this.env);
+	this.formal_args.forEach(function(arg, index){
+		env[arg] = args[index];
 	});
-	for (expr = this.body; expr != null; expr = expr.cdr) {
-		ret = evaluator.evaluate(expr.car, env);
-	}
-	return ret;
+	return new evaluator.Frame({body: this.body, env: env});
 };
+
 evaluator.Procedure.prototype.toString = function(){
 	return this.body.map(evaluator.exprToString).join(' ');
 }
