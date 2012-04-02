@@ -72,7 +72,7 @@ evaluator.evaluate = function evaluate(expr) {
 				if (instruction.car in evaluator.SpecialForms) {
 					ret = evaluator.SpecialForms[instruction.car](instruction, frame.env);
 					if (ret instanceof this.Frame) {
-						this.stack.unshift(ret);
+						stack.unshift(ret);
 						continue newframe;
 					} else {
 						result = ret;
@@ -107,7 +107,7 @@ evaluator.evaluate = function evaluate(expr) {
 				}
 			}
 		} else if ('callback' in frame) {
-			ret = frame.callback(stack[0]);
+			ret = frame.callback(result);
 			if (ret instanceof this.Frame) {
 				stack.unshift(ret);
 			} else {
