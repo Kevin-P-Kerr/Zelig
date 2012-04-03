@@ -277,19 +277,19 @@ evaluator.GlobalEnv = {
 		return total;
 	}),
 	'<': new evaluator.NativeProcedure(function (args) {
-		return args.car < args.cdr.car;
+		return args[0] < args[1];
 	}),
 	'>': new evaluator.NativeProcedure(function (args) {
-		return args.car > args.cdr.car;
+		return args[0] > args[1];
 	}),
 	'<=': new evaluator.NativeProcedure(function (args) {
-		return args.car <= args.cdr.car;
+		return args[0] <= args[1];
 	}),
 	'>=': new evaluator.NativeProcedure(function (args) {
-		return args.car >= args.cdr.car;
+		return args[0] >= args[1];
 	}),
 	'=': new evaluator.NativeProcedure(function  (args) {
-		return args.car === args.cdr.car;
+		return args[0] === args[1];
 	}),
 	'eval': new evaluator.NativeProcedure(function (args) {
 		return new evaluator.Frame({body: new evaluator.List(args[0], null), env: evaluator.GlobalEnv});
