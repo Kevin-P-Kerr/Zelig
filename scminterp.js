@@ -94,7 +94,7 @@ evaluator.evaluate = function evaluate(expr) {
 				// Special case for unlimited caddaddaddar
 				result = evaluator.cadrator.makeProcedure(instruction);
 			} else {
-				throw new Error("Evaluate Error");
+				throw new Error("\"" + instruction + "\" is not defined");
 			}
 			if ('list' in frame) {
 				frame.list.push(result);
