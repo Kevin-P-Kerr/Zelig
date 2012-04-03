@@ -138,6 +138,28 @@ evaluator.SpecialForms = {
 			}
 		});
 	},
+	'cond': function (expr, env) {
+		function testCondition(args) { 	
+			if (!args) { 
+				return undefined;
+			} else if (args.car.car === 'else') {
+				return new evaluator.Frame({ 
+					body: args.car.cdr, 
+					env: Object.create(env)
+				}); 
+			}
+
+			return new evaluator.Frame({	
+				body: new evaluator.List(args.car.car, null),
+				env: env,
+				callback: function aux (result) {
+					return result ? new evaluator.Frame({ body: args.car.cdr, env: Object.create(env)})
+						:  testCondition(args.cdr);
+				}
+			});
+		}
+		return testCondition(expr.cdr);
+	},
 	'define': function (expr, env) {
 		if (expr.cdr.car instanceof evaluator.List) {
 			env[expr.cdr.car.car] = new evaluator.Procedure(expr.cdr.car.cdr, expr.cdr.cdr, env);
