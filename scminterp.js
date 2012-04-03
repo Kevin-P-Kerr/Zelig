@@ -25,7 +25,7 @@ evaluator.List.prototype.toString = function(inner){
 }
 
 evaluator.parse = function(input) {
-	var match, head = new evaluator.List(null, null), stack = [head], descending = false;
+	var match, token, head = new evaluator.List(null, null), stack = [head], descending = false;
 	while (input.length) {
 		if ((match = input.match(/^\(/))) {
 			stack[0] = stack[0][descending ? 'car' : 'cdr'] = new evaluator.List(null, null);
@@ -41,7 +41,12 @@ evaluator.parse = function(input) {
 		} else if ((match = input.match(/^ +/))) {
 			// Ignore whitespace
 		} else if ((match = input.match(/^[^ ()]+/))) { // What are valid identifiers?
-			stack[0] = stack[0][descending ? 'car' : 'cdr'] = new evaluator.List(match[0], null);
+			if (evaluator.isnumber(match[0])) {
+				token = +match[0];
+			} else {
+				token = match[0];
+			}
+			stack[0] = stack[0][descending ? 'car' : 'cdr'] = new evaluator.List(token, null);
 			descending = false;
 		}
 		input = input.substr(match[0].length);
@@ -81,8 +86,8 @@ evaluator.evaluate = function evaluate(expr) {
 					stack.unshift(new this.Frame({ body: instruction, env: frame.env, list: [] }));
 					continue newframe;
 				}
-			} else if (evaluator.isnumber(instruction)) {
-				result = +instruction;
+			} else if (typeof instruction === 'number') {
+				result = instruction;
 			} else if (instruction in frame.env) {
 				result = frame.env[instruction];
 			} else if (evaluator.cadrator.test(instruction)) {
