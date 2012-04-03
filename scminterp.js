@@ -123,11 +123,15 @@ evaluator.evaluate = function evaluate(expr) {
 
 evaluator.SpecialForms = { 
 	'if': function(expr, env) {
-		if (evaluator.evaluate(evaluator.extractTest(expr), env)) {
-			return evaluator.evaluate(evaluator.extractResult(expr), env);
-		} else {
-			return evaluator.evaluate(evaluator.extractElse(expr), env);
-		}
+		return new evaluator.Frame({
+			body: new evaluator.List(evaluator.extractTest(expr), null),
+			env: env,
+			callback: function (result) {
+				return new evaluator.Frame ({
+					body: new evaluator.List( result ? evaluator.extractResult(expr) : evaluator.extractElse(expr), null), 
+					env: env});
+			}
+		});
 	},
 	'define': function (expr, env) {
 		if (expr.cdr.car instanceof evaluator.List) {
