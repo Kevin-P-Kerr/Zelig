@@ -2,18 +2,18 @@ evaluator = {};
 
 evaluator.List = function List(car, cdr) { this.car = car; this.cdr = cdr; };
 
-// Beware! These are all recursive.
 evaluator.List.prototype.map = function(proc){
-	return new evaluator.List(proc(this.car), this.cdr ? this.cdr.map(proc) : null);
+	var head = new evaluator.List(null, null), tail = head;
+	this.forEach(function(item, i, list){
+		tail = tail.cdr = new evaluator.List(proc(item.car, i, list), null);
+	});
+	return head.cdr;
 };
 evaluator.List.prototype.forEach = function(proc){
-	function helper (list, index) {
-		proc(list.car, index);
-		if (list.cdr) {
-			helper(proc, list.cdr, index+1);
-		}
+	var item, i = 0;
+	for (item = this; item; item = item.cdr, i++) {
+		proc(item.car, i, this);
 	}
-	helper(this, 0);
 };
 evaluator.List.prototype.toString = function(inner){
 	var out = [], list = this;
