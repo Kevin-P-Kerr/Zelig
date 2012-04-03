@@ -288,7 +288,7 @@ evaluator.GlobalEnv = {
 		return args.car === args.cdr.car;
 	}),
 	'eval': new evaluator.NativeProcedure(function (args) {
-		return evaluator.evaluate(args.car, evaluator.GlobalEnv);
+		return new evaluator.Frame({body: new evaluator.List(args[0], null), env: evaluator.GlobalEnv});
 	})
 };
 
