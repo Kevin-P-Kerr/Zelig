@@ -93,6 +93,8 @@ evaluator.evaluate = function evaluate(expr) {
 			} else if (evaluator.cadrator.test(instruction)) {
 				// Special case for unlimited caddaddaddar
 				result = evaluator.cadrator.makeProcedure(instruction);
+			} else if (instruction in evaluator.SpecialForms) {
+				throw new Error("\"" + instruction + "\" cannot be used as an expression");
 			} else {
 				throw new Error("\"" + instruction + "\" is not defined");
 			}
