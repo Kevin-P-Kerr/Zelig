@@ -38,9 +38,9 @@ evaluator.parse = function(input) {
 			}
 			stack.shift();
 			descending = false;
-		} else if ((match = input.match(/^ +/))) {
+		} else if ((match = input.match(/^\s+/))) {
 			// Ignore whitespace
-		} else if ((match = input.match(/^[^ ()]+/))) { // What are valid identifiers?
+		} else if ((match = input.match(/^[^\s()]+/))) { // What are valid identifiers?
 			if (evaluator.isnumber(match[0])) {
 				token = +match[0];
 			} else {
