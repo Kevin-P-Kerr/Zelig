@@ -10,7 +10,7 @@ rl.prompt();
 rl.on('line', function(line) {
 	try {
 		evaluator.parse(line).forEach(function(expr){
-			var result = evaluator.evaluate(expr, evaluator.GlobalEnv)
+			var result = evaluator.evaluate(new evaluator.List(expr, null));
 			if (result !== undefined) {
 				console.log(result);
 			}
