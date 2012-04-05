@@ -266,7 +266,7 @@ evaluator.cadrator = {
 	},
 	makeProcedure: function(op){
 		return new evaluator.NativeProcedure(function(args){
-			return this.exec(op, args.car);
+			return this.exec(op, args[0]);
 		}.bind(this));
 	}
 };
@@ -278,30 +278,21 @@ evaluator.GlobalEnv = {
 		}, 0);
 	}),
 	'*': new evaluator.NativeProcedure(function (args) {
-		var total = 1;
-		while (args != null) {
-			total *= args.car;
-			args = args.cdr;
-		}
-		return total;
+		return args.reduce(function (acc, x) {
+			return x * acc;
+		}, 1);
 	}),
 	'-': new evaluator.NativeProcedure(function (args) {
-		var total = args.car;
-		args = args.cdr;
-		while (args != null){
-			total -= args.car;
-			args = args.cdr;
-		}
-		return total;
+		var len = args.length;
+		var n = 0;
+		while (n < len-1) {
+			args[n+1] = args[n] - args[n+1];
+			n++;
+		} return args[args.length-1];
 	}),
 	'/': new evaluator.NativeProcedure(function (args) {
-		var total = args.car;
-		args = args.cdr;
-		while (args != null) {
-			total /= args.car;
-			args = args.cdr;
-		}
-		return total;
+		if (args.length < 1) throw new Error("division needs at least one argument");
+		return args.reduce(function(acc, n){ return acc / n; }, 1);
 	}),
 	'<': new evaluator.NativeProcedure(function (args) {
 		return args[0] < args[1];
