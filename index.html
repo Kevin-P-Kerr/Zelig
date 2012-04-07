@@ -54,6 +54,50 @@
 	</div>
 	<script src="scminterp.js"></script>
 	<script>
+		function keepHistory(input, storageKey) {
+			function saveHistory(){
+				sessionStorage[storageKey] = JSON.stringify(history);
+			}
+			var history = storageKey in sessionStorage ? JSON.parse(sessionStorage[storageKey]) : [],
+				typed = '',
+				i = history.length;
+			input.addEventListener('keydown', function(e){
+				switch (e.keyCode) {
+				case 13: // Return
+					if (input.value){
+						i = history.push(input.value);
+						saveHistory();
+						typed = '';
+					}
+					e.preventDefault();
+					break;
+				case 38: // Up
+					if (i > 0 && history.length){
+						if (i === history.length) {
+							typed = input.value;
+						} else {
+							history[i] = input.value;
+							saveHistory();
+						}
+						input.value = history[--i];
+					}
+					e.preventDefault();
+					break;
+				case 40: // Down
+					if (i < history.length - 1) {
+						history[i] = input.value;
+						saveHistory();
+						input.value = history[++i];
+					} else if (i === history.length - 1) {
+						i++;
+						input.value = typed;
+					}
+					e.preventDefault();
+					break;
+				}
+			}, false);
+		}
+
 		var replHistory = {
 			el: document.getElementById('output'),
 			log: function(className, text) {
@@ -66,6 +110,7 @@
 		var outputList = document.getElementById('output'),
 			commandLine = document.getElementById('inputText');
 
+		keepHistory(commandLine, 'input-history');
 		commandLine.addEventListener('keydown', function(e){
 			if (e.keyCode === 13) {
 				if (commandLine.value) {
