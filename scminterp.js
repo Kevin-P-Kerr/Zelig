@@ -109,9 +109,6 @@ evaluator.evaluate = function evaluate(expr) {
 				stack.unshift(ret);
 			} else {
 				result = ret;
-				if ('list' in stack[0]) {
-					stack[0].list.push(result);
-				}
 			}
 		} else if ('callback' in frame) {
 			ret = frame.callback(result);
@@ -119,10 +116,10 @@ evaluator.evaluate = function evaluate(expr) {
 				stack.unshift(ret);
 			} else {
 				result = ret;
-				if ('list' in stack[0]) {
-					stack[0].list.push(result);
-				}
 			}
+		}
+		if (stack.length && 'list' in stack[0]) {
+			stack[0].list.push(result);
 		}
 	}
 	return result;
