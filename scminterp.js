@@ -108,15 +108,12 @@ evaluator.evaluate = function evaluate(expr) {
 			}
 		}
 		stack.shift();
-		if ('list' in frame) {
-			ret = frame.list[0].prepare(frame.list.slice(1));
-			if (ret instanceof this.Frame) {
-				stack.unshift(ret);
-			} else {
-				result = ret;
+		if ('list' in frame || 'callback' in frame) {
+			if ('list' in frame) {
+				ret = frame.list[0].prepare(frame.list.slice(1));
+			} else if ('callback' in frame) {
+				ret = frame.callback(result);
 			}
-		} else if ('callback' in frame) {
-			ret = frame.callback(result);
 			if (ret instanceof this.Frame) {
 				stack.unshift(ret);
 			} else {
