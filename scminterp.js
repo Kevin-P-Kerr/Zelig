@@ -9,6 +9,11 @@ evaluator.List.prototype.map = function(proc){
 	});
 	return head.cdr;
 };
+evaluator.List.prototype.length = function(){
+	var l = 0;
+	this.forEach(function(){ l++; });
+	return l;
+};
 evaluator.List.prototype.forEach = function(proc){
 	var item, i = 0;
 	for (item = this; item; item = item.cdr, i++) {
@@ -215,15 +220,21 @@ evaluator.isnumber = function(expr) {
 evaluator.Procedure = function (formal_args, body, env) {
 		
 	this.formal_args = formal_args;
+	this.argc = formal_args ? formal_args.length() : 0;
 	this.body = body;
 	this.env = env;
 }
 
 evaluator.Procedure.prototype.prepare = function(args) {
 	var env = Object.create(this.env);
-	this.formal_args.forEach(function(arg, index){
-		env[arg] = args[index];
-	});
+	if (args.length != this.argc) {
+		throw new Error("Expects " + this.argc + " argument" + (this.argc === 1 ? '' : 's') + ", got " + args.length);
+	}
+	if (this.formal_args) {
+		this.formal_args.forEach(function(arg, index){
+			env[arg] = args[index];
+		});
+	}
 	return new evaluator.Frame({body: this.body, env: env});
 };
 
