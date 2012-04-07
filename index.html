@@ -55,18 +55,17 @@
 	<script src="scminterp.js"></script>
 	<script>
 		function keepHistory(input, storageKey) {
-			function saveHistory(){
-				sessionStorage[storageKey] = JSON.stringify(history);
-			}
-			var history = storageKey in sessionStorage ? JSON.parse(sessionStorage[storageKey]) : [],
+			var permanentHistory = storageKey in sessionStorage ? JSON.parse(sessionStorage[storageKey]) : [],
+				history = permanentHistory.slice(),
 				typed = '',
 				i = history.length;
 			input.addEventListener('keydown', function(e){
 				switch (e.keyCode) {
 				case 13: // Return
 					if (input.value){
-						i = history.push(input.value);
-						saveHistory();
+						i = permanentHistory.push(input.value);
+						sessionStorage[storageKey] = JSON.stringify(permanentHistory);
+						history = permanentHistory.slice();
 						typed = '';
 					}
 					e.preventDefault();
@@ -77,7 +76,6 @@
 							typed = input.value;
 						} else {
 							history[i] = input.value;
-							saveHistory();
 						}
 						input.value = history[--i];
 					}
@@ -86,7 +84,6 @@
 				case 40: // Down
 					if (i < history.length - 1) {
 						history[i] = input.value;
-						saveHistory();
 						input.value = history[++i];
 					} else if (i === history.length - 1) {
 						i++;
