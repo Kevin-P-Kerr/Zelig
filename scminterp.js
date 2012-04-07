@@ -115,7 +115,11 @@ evaluator.evaluate = function evaluate(expr) {
 				ret = frame.callback(result);
 			}
 			if (ret instanceof this.Frame) {
-				stack.unshift(ret);
+				if (stack.length && stack[0].body === null && !('list' in stack[0]) && !('callback' in stack[0])) {
+					stack[0] = ret;
+				} else {
+					stack.unshift(ret);
+				}
 			} else {
 				result = ret;
 			}
