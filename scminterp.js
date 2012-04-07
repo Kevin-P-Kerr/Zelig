@@ -77,7 +77,8 @@ evaluator.Frame = function Frame(properties) {
 
 evaluator.evaluate = function evaluate(expr) {
 	var stack = [new this.Frame({ body: expr, env: this.GlobalEnv })],
-		result = undefined, frame, ret, instruction;
+		result = undefined, frame, ret, instruction,
+		maxStackDepth = 0;
 	newframe:
 	while (stack.length) {
 		frame = stack[0];
@@ -113,6 +114,7 @@ evaluator.evaluate = function evaluate(expr) {
 				frame.list.push(result);
 			}
 		}
+		if (stack.length > maxStackDepth) maxStackDepth = stack.length;
 		stack.shift();
 		if ('list' in frame || 'callback' in frame) {
 			if ('list' in frame) {
@@ -134,6 +136,7 @@ evaluator.evaluate = function evaluate(expr) {
 			stack[0].list.push(result);
 		}
 	}
+	console.log("At most the stack had %d frames", maxStackDepth);
 	return result;
 };
 
