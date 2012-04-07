@@ -5,7 +5,7 @@ evaluator.List = function List(car, cdr) { this.car = car; this.cdr = cdr; };
 evaluator.List.prototype.map = function(proc){
 	var head = new evaluator.List(null, null), tail = head;
 	this.forEach(function(item, i, list){
-		tail = tail.cdr = new evaluator.List(proc(item.car, i, list), null);
+		tail = tail.cdr = new evaluator.List(proc(item, i, list), null);
 	});
 	return head.cdr;
 };
@@ -16,14 +16,18 @@ evaluator.List.prototype.length = function(){
 };
 evaluator.List.prototype.forEach = function(proc){
 	var item, i = 0;
-	for (item = this; item; item = item.cdr, i++) {
-		proc(item.car, i, this);
+	for (item = this; item instanceof evaluator.List; item = item.cdr, i++) {
+		proc(item.cdr instanceof evaluator.List || item.cdr === null ? item.car : item, i, this);
 	}
 };
 evaluator.List.prototype.toString = function(inner){
 	var out = [], list = this;
 	while (list != null){
-		out.push(list.car instanceof this.constructor ? list.car.toString(true) : list.car);
+		if (!(list instanceof evaluator.List)) {
+			out.push('.', list);
+			break;
+		}
+		out.push(list.car instanceof evaluator.List ? list.car.toString(true) : evaluator.exprToString(list.car, true));
 		list = list.cdr;
 	}
 	return (inner ? '' : "'") + "(" + out.join(' ') + ')';
@@ -246,11 +250,11 @@ evaluator.Procedure.prototype.toString = function(){
 }
 
 
-evaluator.exprToString = function(expr){
+evaluator.exprToString = function(expr, inner){
 	if (Array.isArray(expr)) {
 		return '(' + expr.map(evaluator.exprToString).join(' ') + ')';
 	} else if (expr === null) {
-		return '()';
+		return inner ? '()' : '\'()';
 	} else {
 		return expr;
 	}
