@@ -46,7 +46,9 @@ evaluator.parse = function(input) {
 		} else if ((match = input.match(/^\s+/))) {
 			// Ignore whitespace
 		} else if ((match = input.match(/^[^\s()]+/))) { // What are valid identifiers?
-			if (evaluator.isnumber(match[0])) {
+			if (match[0] === 'null') {
+				token = null;
+			} else if (evaluator.isnumber(match[0])) {
 				token = +match[0];
 			} else {
 				token = match[0];
@@ -91,7 +93,7 @@ evaluator.evaluate = function evaluate(expr) {
 					stack.unshift(new this.Frame({ body: instruction, env: frame.env, list: [] }));
 					continue newframe;
 				}
-			} else if (typeof instruction === 'number') {
+			} else if (typeof instruction === 'number' || instruction === null) {
 				result = instruction;
 			} else if (instruction in frame.env) {
 				result = frame.env[instruction];
@@ -247,6 +249,8 @@ evaluator.Procedure.prototype.toString = function(){
 evaluator.exprToString = function(expr){
 	if (Array.isArray(expr)) {
 		return '(' + expr.map(evaluator.exprToString).join(' ') + ')';
+	} else if (expr === null) {
+		return '()';
 	} else {
 		return expr;
 	}
