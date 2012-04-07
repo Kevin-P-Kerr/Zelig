@@ -328,6 +328,12 @@ evaluator.GlobalEnv = {
 	}),
 	'eval': new evaluator.NativeProcedure(function (args) {
 		return new evaluator.Frame({body: new evaluator.List(args[0], null), env: evaluator.GlobalEnv});
+	}),
+	'null?': new evaluator.NativeProcedure(function (args) {
+		return args[0] === null;
+	}),
+	'cons': new evaluator.NativeProcedure(function (args) {
+		return new evaluator.List(args[0], args[1]);
 	})
 };
 
